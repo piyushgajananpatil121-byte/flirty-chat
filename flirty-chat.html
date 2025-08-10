@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>Flirty Chat App</title>
+  <meta charset="UTF-8" />
   <style>
     body { font-family: Arial, sans-serif; max-width: 400px; margin: 20px auto; }
     #chat { border: 1px solid #ccc; height: 300px; overflow-y: auto; padding: 10px; margin-bottom: 10px; }
@@ -92,7 +93,6 @@
       userSend(text);
       userInput.value = '';
 
-      // Respond with a random flirty line after short delay
       setTimeout(() => {
         let reply = botLines[Math.floor(Math.random() * botLines.length)];
         botSend(reply);
