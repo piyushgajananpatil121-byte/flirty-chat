@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chat with Your Crush ❤️</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(to right, #ff758c, #ff7eb3);
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+    }
+    header {
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white;
+        text-align: center;
+        padding: 15px;
+        font-size: 1.5em;
+        font-weight: bold;
+        backdrop-filter: blur(5px);
+    }
+    #chat {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+    .message {
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 10px;
+        max-width: 70%;
+    }
+    .user {
+        background-color: rgba(255, 255, 255, 0.8);
+        align-self: flex-end;
+    }
+    .bot {
+        background-color: rgba(255, 255, 255, 0.3);
+        color: white;
+        align-self: flex-start;
+    }
+    #input-area {
+        display: flex;
+        padding: 10px;
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+    #userInput {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        border-radius: 20px;
+        outline: none;
+        font-size: 1em;
+    }
+    #sendBtn {
+        background-color: white;
+        border: none;
+        padding: 10px 20px;
+        margin-left: 10px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+</style>
+</head>
+<body>
+    <header>💌 Chat with Your Crush</header>
+    <div id="chat"></div>
+    <div id="input-area">
+        <input type="text" id="userInput" placeholder="Type your message...">
+        <button id="sendBtn">Send</button>
+    </div>
+
+<script>
+async function getAIResponse(userMessage) {
+    const API_URL = "https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill";
+    const API_KEY = "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"; // 🔹 Replace with your Hugging Face token
+
+    const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${API_KEY}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ inputs: userMessage })
+    });
+
+    const data = await response.json();
+    return data[0]?.generated_text || "Sorry, I couldn’t process that.";
+}
+
+function addMessage(text, sender) {
+    let msgDiv = document.createElement("div");
+    msgDiv.classList.add("message", sender);
+    msgDiv.textContent = text;
+    document.getElementById("chat").appendChild(msgDiv);
+    document.getElementById("chat").scrollTop = document.getElementById("chat").scrollHeight;
+}
+
+document.getElementById("sendBtn").addEventListener("click", async () => {
+    let userMessage = document.getElementById("userInput").value.trim();
+    if (!userMessage) return;
+
+    addMessage("You: " + userMessage, "user");
+    document.getElementById("userInput").value = "";
+
+    let reply = await getAIResponse(userMessage);
+    addMessage("Crush: " + reply, "bot");
+});
+
+// Enter key sends message
+document.getElementById("userInput").addEventListener("keypress", function(e) {
+    if (e.key === "Enter") {
+        document.getElementById("sendBtn").click();
+    }
+});
+</script>
+</body>
+</html>
