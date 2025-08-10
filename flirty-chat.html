@@ -1,55 +1,884 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Flirty Chat App</title>
-  <style>
-    /* Simple styles omitted for brevity */
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Flirty Chat Deluxe Plus 💬❤️✨</title>
+
+<style>
+  /* ====== Fonts & Reset ====== */
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+  * {
+    box-sizing: border-box;
+  }
+  body,html {
+    margin: 0; padding: 0;
+    font-family: 'Poppins', sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--bg-gradient);
+    transition: background 0.8s ease;
+  }
+
+  /* Theme variables */
+  :root {
+    --color-primary: #7b3fe4;
+    --color-primary-light: #ac79ff;
+    --color-primary-dark: #5e2cc3;
+    --bg-gradient: linear-gradient(135deg, #fceabb, #f8b500);
+    --bg-chat: #fdf4fb;
+    --color-text-light: #222;
+    --color-text-dark: #eee;
+  }
+  body.dark {
+    --bg-gradient: linear-gradient(135deg, #2c2c54, #121212);
+    --bg-chat: #1c1c2a;
+    --color-text-light: #eee;
+  }
+
+  #app {
+    background: var(--bg-chat);
+    width: 420px;
+    max-width: 95vw;
+    height: 720px;
+    border-radius: 25px;
+    box-shadow: 0 18px 45px rgba(123,63,228,0.35);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    color: var(--color-text-light);
+    transition: color 0.8s ease, background 0.8s ease;
+  }
+
+  /* ====== Gender & Personality Selection Screen ====== */
+  #genderScreen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background: var(--color-primary);
+    color: white;
+    text-align: center;
+  }
+  #genderScreen h1 {
+    font-size: 2.6rem;
+    margin-bottom: 12px;
+    text-shadow: 1px 1px 5px rgba(0,0,0,0.2);
+  }
+  select, button {
+    padding: 14px 20px;
+    font-size: 1.2rem;
+    border-radius: 30px;
+    border: none;
+    outline: none;
+    margin-bottom: 20px;
+    width: 70%;
+    max-width: 280px;
+    cursor: pointer;
+    font-weight: 600;
+    box-shadow: 0 8px 20px rgba(255,255,255,0.3);
+    transition: background-color 0.3s ease;
+  }
+  select {
+    background: #9d6aff;
+    color: white;
+  }
+  select:hover {
+    background: #ac79ff;
+  }
+  button {
+    background: #ff61a6;
+    color: white;
+  }
+  button:hover {
+    background: #ff3a7a;
+  }
+
+  /* ====== Crush Name Screen ====== */
+  #crushScreen {
+    display: none;
+    padding: 40px;
+    text-align: center;
+    color: var(--color-text-light);
+  }
+  #crushScreen h2 {
+    font-size: 1.9rem;
+    margin-bottom: 16px;
+  }
+  #crushScreen input {
+    padding:14px 20px;
+    font-size:1.2rem;
+    border-radius:30px;
+    border: 2px solid var(--color-primary);
+    width: 80%;
+    max-width: 280px;
+    outline:none;
+    color: var(--color-text-light);
+    background: transparent;
+  }
+  #crushScreen button {
+    margin-top: 24px;
+    padding: 14px 36px;
+  }
+
+  /* ====== Chat Screen ====== */
+  #chatScreen {
+    flex: 1;
+    display: none;
+    flex-direction: column;
+    padding: 16px 20px 80px;
+    overflow: hidden;
+    position: relative;
+  }
+  #chatHeader {
+    font-weight: 700;
+    font-size: 1.6rem;
+    color: var(--color-primary);
+    margin-bottom: 12px;
+    user-select: none;
+    text-shadow: 0 1px 2px rgba(123,63,228,0.3);
+    transition: color 0.8s ease;
+  }
+  #clearBtn, #exportBtn, #themeToggleBtn {
+    position: absolute;
+    top: 12px;
+    border: none;
+    font-weight: 700;
+    padding: 8px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(123,63,228,0.6);
+    transition: background-color 0.3s ease;
+    color: white;
+  }
+  #clearBtn {
+    right: 20px;
+    background: #ff4d6d;
+  }
+  #clearBtn:hover {
+    background: #e62a54;
+  }
+  #exportBtn {
+    right: 130px;
+    background: #4db8ff;
+  }
+  #exportBtn:hover {
+    background: #3399ff;
+  }
+  #themeToggleBtn {
+    right: 250px;
+    background: #7b3fe4;
+  }
+  #themeToggleBtn:hover {
+    background: #5e2cc3;
+  }
+
+  #chat {
+    flex-grow: 1;
+    overflow-y: auto;
+    background: var(--bg-chat);
+    border-radius: 20px;
+    padding: 16px;
+    box-shadow: inset 0 6px 12px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    scroll-behavior: smooth;
+    color: var(--color-text-light);
+    transition: color 0.8s ease, background 0.8s ease;
+  }
+  #chat::-webkit-scrollbar {
+    width: 8px;
+  }
+  #chat::-webkit-scrollbar-track {
+    background: #f8e5f6;
+    border-radius: 20px;
+  }
+  #chat::-webkit-scrollbar-thumb {
+    background: #d58cee;
+    border-radius: 20px;
+  }
+
+  .message {
+    max-width: 70%;
+    padding: 14px 20px;
+    border-radius: 28px;
+    font-size: 1rem;
+    line-height: 1.4;
+    position: relative;
+    box-shadow: 0 8px 20px rgba(123,63,228,0.2);
+    user-select: none;
+    animation: fadeInUp 0.4s ease forwards;
+    opacity: 0;
+    transform: translateY(20px);
+    color: inherit;
+  }
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .bot {
+    background: #f3e9ff;
+    color: var(--color-primary);
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+  }
+  .user {
+    background: var(--color-primary);
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+  }
+  .timestamp {
+    font-size: 0.65rem;
+    color: #999;
+    margin-top: 4px;
+    user-select: none;
+    opacity: 0.7;
+  }
+  #typingIndicator {
+    height: 22px;
+    margin-top: 8px;
+    font-style: italic;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    user-select: none;
+  }
+  #typingIndicator.visible {
+    opacity: 1;
+  }
+  #inputArea {
+    position: absolute;
+    bottom: 16px;
+    left: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+  }
+  #userInput {
+    flex-grow: 1;
+    border-radius: 30px;
+    padding: 14px 20px;
+    font-size: 1.1rem;
+    border: 2px solid #d8b7f7;
+    outline: none;
+    box-shadow: inset 0 3px 8px rgba(123,63,228,0.15);
+    transition: border-color 0.3s ease;
+    color: var(--color-text-light);
+    background: transparent;
+  }
+  #userInput:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 15px var(--color-primary);
+  }
+  #sendBtn {
+    background: var(--color-primary);
+    color: white;
+    border-radius: 30px;
+    border: none;
+    padding: 0 24px;
+    font-size: 1.15rem;
+    cursor: pointer;
+    font-weight: 700;
+    box-shadow: 0 8px 25px rgba(123,63,228,0.5);
+    transition: background-color 0.3s ease;
+  }
+  #sendBtn:hover {
+    background: var(--color-primary-dark);
+  }
+  #emojiBtn {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    user-select: none;
+    color: var(--color-primary);
+    transition: color 0.3s ease;
+  }
+  #emojiBtn:hover {
+    color: var(--color-primary-dark);
+  }
+  #emojiPicker {
+    position: absolute;
+    bottom: 68px;
+    right: 20px;
+    background: var(--bg-chat);
+    border-radius: 15px;
+    box-shadow: 0 12px 40px rgba(123,63,228,0.3);
+    padding: 12px 16px;
+    display: none;
+    max-width: 280px;
+    max-height: 200px;
+    overflow-y: auto;
+    user-select: none;
+    color: var(--color-text-light);
+  }
+  #emojiPicker.visible {
+    display: block;
+  }
+  #emojiPicker span {
+    font-size: 1.6rem;
+    cursor: pointer;
+    margin: 4px 6px;
+    transition: transform 0.15s ease;
+    display: inline-block;
+  }
+  #emojiPicker span:hover {
+    transform: scale(1.4);
+  }
+
+  @media (max-width: 480px) {
+    #app {
+      width: 95vw;
+      height: 90vh;
+    }
+    #chat {
+      padding: 12px;
+    }
+    #userInput {
+      font-size: 1rem;
+      padding: 12px 16px;
+    }
+  }
+
+  /* === Particle background container === */
+  #particleCanvas {
+    position: fixed;
+    top:0; left:0; width:100vw; height:100vh;
+    pointer-events: none;
+    z-index: 0;
+  }
+</style>
 </head>
 <body>
-  <select id="genderSelect">
-    <option value="">Select gender</option>
-    <option value="boy">Boy</option>
-    <option value="girl">Girl</option>
-  </select>
-  <button onclick="startChat()">Start</button>
 
-  <div id="chat" style="display:none;"></div>
-  <input id="userInput" style="display:none;" />
-  <button onclick="sendMessage()" style="display:none;">Send</button>
+<canvas id="particleCanvas"></canvas>
 
-  <script>
-    const botReplies = {
-      boy: ["Hey beautiful! 😘", "You look amazing today!"],
-      girl: ["Hey handsome! 😉", "You have a great smile!"]
-    };
-    let gender = "";
-    function startChat() {
-      gender = document.getElementById('genderSelect').value;
-      if (!gender) return alert("Please select a gender!");
-      document.getElementById('chat').style.display = "block";
-      document.getElementById('userInput').style.display = "inline";
-      document.querySelector('button[onclick="sendMessage()"]').style.display = "inline";
-      addMessage("Bot", `Hi! Let's chat. (${gender})`);
+<div id="app">
+
+  <!-- Gender and Personality selection -->
+  <section id="genderScreen" aria-label="Gender selection screen">
+    <h1>Choose Your Gender 💖</h1>
+    <select id="genderSelect" aria-label="Select your gender">
+      <option value="">-- Select --</option>
+      <option value="boy">Boy</option>
+      <option value="girl">Girl</option>
+    </select>
+
+    <h2>Choose Your Mood 😏</h2>
+    <select id="moodSelect" aria-label="Select chat mood">
+      <option value="flirty">Flirty</option>
+      <option value="sweet">Sweet</option>
+      <option value="playful">Playful</option>
+      <option value="cheeky">Cheeky</option>
+    </select>
+
+    <button id="startBtn" aria-label="Next step">Next</button>
+  </section>
+
+  <!-- Crush Name Screen -->
+  <section id="crushScreen" aria-label="Crush name screen" style="display:none; padding: 40px; text-align: center;">
+    <h2>What's your crush's name? 💖</h2>
+    <input type="text" id="crushNameInput" placeholder="Enter crush's name" aria-label="Enter your crush's name" />
+    <br /><br />
+    <button id="startChatBtn">Start Chatting</button>
+  </section>
+
+  <!-- Chat Screen -->
+  <section id="chatScreen" aria-label="Chat screen" aria-live="polite" aria-atomic="false" style="display:none;">
+    <div id="chatHeader">Flirty Chat 💬</div>
+    <button id="clearBtn" aria-label="Clear chat">Clear Chat</button>
+    <button id="exportBtn" aria-label="Export chat">Export Chat</button>
+    <button id="themeToggleBtn" aria-label="Toggle theme">Dark Mode</button>
+
+    <div id="chat" role="log"></div>
+    <div id="typingIndicator" aria-live="assertive" aria-atomic="true" aria-relevant="text"></div>
+
+    <div id="inputArea">
+      <button id="emojiBtn" aria-label="Emoji picker">😊</button>
+      <input id="userInput" type="text" autocomplete="off" placeholder="Type a message..." aria-label="Type your message" />
+      <button id="sendBtn" aria-label="Send message">Send</button>
+    </div>
+
+    <div id="emojiPicker" aria-label="Emoji picker popup" role="list"></div>
+  </section>
+
+</div>
+
+<script>
+(() => {
+  // Data: personalities with moods
+  const botLines = {
+    boy: {
+      flirty: [
+        "Hey beautiful 😘",
+        "Your eyes are mesmerizing!",
+        "How do you always look so amazing?",
+        "You just made my day better.",
+        "I can't stop thinking about you.",
+        "You're my sunshine on a cloudy day!",
+        "Are you always this charming?",
+        "Every time I see you, I smile!",
+        "You have the cutest smile!",
+        "Tell me, what's your secret?"
+      ],
+      sweet: [
+        "Hey there 😊",
+        "You make me so happy.",
+        "Your smile is everything.",
+        "Can't wait to talk more with you.",
+        "You are special to me.",
+        "Sending you lots of love ❤️",
+        "I hope your day is great!",
+        "You brighten my world.",
+        "Thanks for being you.",
+        "I adore you."
+      ],
+      playful: [
+        "Hey! Ready for some fun?",
+        "Bet you can't beat me at texting 😜",
+        "You're too cute to handle!",
+        "Tell me a secret, will ya?",
+        "I'm all ears 👂",
+        "Let's make this chat interesting!",
+        "Are you a magician? Because whenever I look at you, everyone else disappears!",
+        "You owe me a coffee ☕",
+        "Bet you smile when you see my messages.",
+        "Playtime begins!"
+      ],
+      cheeky: [
+        "You naughty thing 😉",
+        "I bet you're blushing 😏",
+        "Is it hot in here or just our chat?",
+        "You're trouble... and I like it!",
+        "Don't make me jealous now 😈",
+        "Careful, I might flirt back twice as hard!",
+        "You're on thin ice... melting it!",
+        "I like your style... especially that smile!",
+        "Got any mischief planned?",
+        "You make my heart skip a beat!"
+      ]
+    },
+    girl: {
+      flirty: [
+        "Hey handsome 😉",
+        "You have the cutest smile!",
+        "Tell me, what's your secret?",
+        "Are you always this charming?",
+        "I could talk to you forever.",
+        "You brighten up my day!",
+        "You're looking great today!",
+        "You make my heart race!",
+        "Can't wait to hear from you!",
+        "You're simply amazing!"
+      ],
+      sweet: [
+        "Hi there 😊",
+        "You're such a sweetheart.",
+        "Talking to you is the best part of my day.",
+        "I treasure every message from you.",
+        "You always know how to make me smile.",
+        "Sending hugs your way 🤗",
+        "You make life beautiful.",
+        "Thanks for being so amazing.",
+        "I adore you.",
+        "You're wonderful."
+      ],
+      playful: [
+        "Hey you! Ready to play?",
+        "Bet you can't guess what I'm thinking 😜",
+        "You're way too cute!",
+        "Tell me a secret, will ya?",
+        "I'm all ears 👂",
+        "Let's have some fun!",
+        "You owe me a dance 💃",
+        "Bet you smile when you see my messages.",
+        "Playtime begins!",
+        "Careful, I'm a little mischievous!"
+      ],
+      cheeky: [
+        "You cheeky devil 😉",
+        "Are you trying to steal my heart?",
+        "Things are heating up between us!",
+        "You're trouble... and I like it!",
+        "Don't make me jealous now 😈",
+        "I like your style... especially that smile!",
+        "Got any mischief planned?",
+        "You make my heart skip a beat!",
+        "You naughty thing!",
+        "Let's break some rules!"
+      ]
     }
-    function addMessage(sender, text) {
-      const chat = document.getElementById('chat');
-      const div = document.createElement('div');
-      div.textContent = `${sender}: ${text}`;
-      chat.appendChild(div);
+  };
+
+  const emojis = ['😄','😆','😊','😉','😍','😘','😜','🤩','🤗','😎','🥰','😇','😛','🤑','😺','🤔','😴','😏','🤪','😌','😋','😢','😭','😤','😡','🤬','🤯','🥳','🤠','😷','🤡','💖','🔥','✨','🌟','💯','🎉','🎶','💃','🕺'];
+
+  // DOM Elements
+  const genderScreen = document.getElementById('genderScreen');
+  const genderSelect = document.getElementById('genderSelect');
+  const moodSelect = document.getElementById('moodSelect');
+  const startBtn = document.getElementById('startBtn');
+
+  const crushScreen = document.getElementById('crushScreen');
+  const crushNameInput = document.getElementById('crushNameInput');
+  const startChatBtn = document.getElementById('startChatBtn');
+
+  const chatScreen = document.getElementById('chatScreen');
+  const chat = document.getElementById('chat');
+  const chatHeader = document.getElementById('chatHeader');
+  const clearBtn = document.getElementById('clearBtn');
+  const exportBtn = document.getElementById('exportBtn');
+  const themeToggleBtn = document.getElementById('themeToggleBtn');
+  const typingIndicator = document.getElementById('typingIndicator');
+
+  const userInput = document.getElementById('userInput');
+  const sendBtn = document.getElementById('sendBtn');
+  const emojiBtn = document.getElementById('emojiBtn');
+  const emojiPicker = document.getElementById('emojiPicker');
+
+  const particleCanvas = document.getElementById('particleCanvas');
+  const ctx = particleCanvas.getContext('2d');
+
+  let currentGender = '';
+  let currentMood = '';
+  let crushName = '';
+  let isChatStarted = false;
+  let typingTimeout = null;
+  let isDarkMode = false;
+
+  // === PARTICLE BACKGROUND CODE ===
+  const particles = [];
+  const PARTICLE_COUNT = 70;
+  const particleColors = ['#7b3fe4', '#ac79ff', '#d58cee', '#ff61a6'];
+
+  class Particle {
+    constructor() {
+      this.x = Math.random() * window.innerWidth;
+      this.y = Math.random() * window.innerHeight;
+      this.size = Math.random() * 4 + 1;
+      this.speedX = (Math.random() - 0.5) * 0.6;
+      this.speedY = (Math.random() - 0.5) * 0.6;
+      this.color = particleColors[Math.floor(Math.random() * particleColors.length)];
+      this.alpha = Math.random() * 0.6 + 0.4;
     }
-    function sendMessage() {
-      const input = document.getElementById('userInput');
-      const text = input.value.trim();
-      if (!text) return;
-      addMessage("You", text);
-      input.value = "";
-      setTimeout(() => {
-        const replies = botReplies[gender];
-        const reply = replies[Math.floor(Math.random() * replies.length)];
-        addMessage("Bot", reply);
-      }, 1000);
+    update() {
+      this.x += this.speedX;
+      this.y += this.speedY;
+      if(this.x < 0 || this.x > window.innerWidth) this.speedX *= -1;
+      if(this.y < 0 || this.y > window.innerHeight) this.speedY *= -1;
     }
-  </script>
+    draw() {
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(${hexToRgb(this.color)},${this.alpha})`;
+      ctx.shadowColor = this.color;
+      ctx.shadowBlur = 6;
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+      ctx.fill();
+    }
+  }
+  function hexToRgb(hex) {
+    hex = hex.replace('#','');
+    const bigint = parseInt(hex,16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return `${r},${g},${b}`;
+  }
+  function initParticles() {
+    particles.length = 0;
+    for(let i=0; i<PARTICLE_COUNT; i++) {
+      particles.push(new Particle());
+    }
+  }
+  function animateParticles() {
+    ctx.clearRect(0,0,window.innerWidth,window.innerHeight);
+    particles.forEach(p => {
+      p.update();
+      p.draw();
+    });
+    requestAnimationFrame(animateParticles);
+  }
+  function resizeCanvas() {
+    particleCanvas.width = window.innerWidth;
+    particleCanvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', () => {
+    resizeCanvas();
+  });
+
+  // === CHAT FUNCTIONS ===
+
+  function appendMessage(text, sender) {
+    const msgDiv = document.createElement('div');
+    msgDiv.classList.add('message', sender);
+    msgDiv.textContent = text;
+
+    const timeSpan = document.createElement('div');
+    timeSpan.classList.add('timestamp');
+    const now = new Date();
+    timeSpan.textContent = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    msgDiv.appendChild(timeSpan);
+
+    chat.appendChild(msgDiv);
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  function showTypingIndicator(show) {
+    if (show) {
+      typingIndicator.textContent = `${crushName} is typing...`;
+      typingIndicator.classList.add('visible');
+    } else {
+      typingIndicator.textContent = "";
+      typingIndicator.classList.remove('visible');
+    }
+  }
+
+  function botReply() {
+    showTypingIndicator(true);
+    clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(() => {
+      showTypingIndicator(false);
+      if (!isChatStarted) return;
+      const lines = botLines[currentGender][currentMood];
+      const reply = lines[Math.floor(Math.random() * lines.length)];
+      appendMessage(reply, 'bot');
+      saveChat();
+    }, 1500);
+  }
+
+  function saveChat() {
+    const messages = [];
+    chat.querySelectorAll('.message').forEach(msg => {
+      messages.push({
+        text: msg.firstChild.textContent,
+        sender: msg.classList.contains('bot') ? 'bot' : 'user',
+        timestamp: msg.querySelector('.timestamp').textContent
+      });
+    });
+    localStorage.setItem('flirtyChatHistory', JSON.stringify(messages));
+    localStorage.setItem('flirtyChatCrushName', crushName);
+    localStorage.setItem('flirtyChatGender', currentGender);
+    localStorage.setItem('flirtyChatMood', currentMood);
+    localStorage.setItem('flirtyChatTheme', isDarkMode ? 'dark' : 'light');
+  }
+
+  function loadChat() {
+    const saved = localStorage.getItem('flirtyChatHistory');
+    if (!saved) return;
+    const savedName = localStorage.getItem('flirtyChatCrushName');
+    const savedGender = localStorage.getItem('flirtyChatGender');
+    const savedMood = localStorage.getItem('flirtyChatMood');
+    const savedTheme = localStorage.getItem('flirtyChatTheme');
+    if(savedName) crushName = savedName;
+    if(savedGender) currentGender = savedGender;
+    if(savedMood) currentMood = savedMood;
+    if(savedTheme) {
+      isDarkMode = savedTheme === 'dark';
+      updateTheme();
+    }
+    chatHeader.textContent = `Flirty Chat with ${crushName} 💬`;
+    genderScreen.style.display = 'none';
+    crushScreen.style.display = 'none';
+    chatScreen.style.display = 'flex';
+    moodSelect.value = currentMood;
+    genderSelect.value = currentGender;
+    const messages = JSON.parse(saved);
+    chat.innerHTML = '';
+    messages.forEach(m => {
+      appendMessage(m.text, m.sender);
+    });
+  }
+
+  function clearChat() {
+    if(confirm("Clear chat history?")) {
+      localStorage.removeItem('flirtyChatHistory');
+      localStorage.removeItem('flirtyChatCrushName');
+      localStorage.removeItem('flirtyChatGender');
+      localStorage.removeItem('flirtyChatMood');
+      localStorage.removeItem('flirtyChatTheme');
+      chat.innerHTML = '';
+      crushName = '';
+      currentGender = '';
+      currentMood = '';
+      isChatStarted = false;
+      chatScreen.style.display = 'none';
+      crushScreen.style.display = 'none';
+      genderScreen.style.display = 'flex';
+    }
+  }
+
+  function toggleEmojiPicker() {
+    emojiPicker.classList.toggle('visible');
+  }
+
+  function addEmoji(emoji) {
+    userInput.value += emoji;
+    userInput.focus();
+  }
+
+  function proceedToCrushScreen() {
+    const gender = genderSelect.value;
+    const mood = moodSelect.value;
+    if(!gender) {
+      alert("Please select your gender!");
+      return;
+    }
+    if(!mood) {
+      alert("Please select your mood!");
+      return;
+    }
+    currentGender = gender;
+    currentMood = mood;
+    genderScreen.style.display = 'none';
+    crushScreen.style.display = 'flex';
+    crushNameInput.value = '';
+    crushNameInput.focus();
+  }
+
+  function startChat() {
+    crushName = crushNameInput.value.trim();
+    if(!crushName) {
+      alert("Please enter your crush's name!");
+      crushNameInput.focus();
+      return;
+    }
+    isChatStarted = true;
+    chatScreen.style.display = 'flex';
+    crushScreen.style.display = 'none';
+    chatHeader.textContent = `Flirty Chat with ${crushName} 💬`;
+    chat.innerHTML = '';
+    loadChat();
+    if(chat.childNodes.length === 0) {
+      appendMessage(`Hey there! Ready for some fun chat? 😘`, 'bot');
+    }
+    userInput.focus();
+  }
+
+  function sendMessage() {
+    if(!isChatStarted) return;
+    const text = userInput.value.trim();
+    if(!text) return;
+    appendMessage(text, 'user');
+    userInput.value = '';
+    saveChat();
+    botReply();
+  }
+
+  function buildEmojiPicker() {
+    emojiPicker.innerHTML = '';
+    emojis.forEach(e => {
+      const span = document.createElement('span');
+      span.textContent = e;
+      span.tabIndex = 0;
+      span.setAttribute('role', 'button');
+      span.setAttribute('aria-label', `Emoji ${e}`);
+      span.addEventListener('click', () => {
+        addEmoji(e);
+        toggleEmojiPicker();
+      });
+      span.addEventListener('keydown', (ev) => {
+        if(ev.key === 'Enter' || ev.key === ' ') {
+          ev.preventDefault();
+          addEmoji(e);
+          toggleEmojiPicker();
+        }
+      });
+      emojiPicker.appendChild(span);
+    });
+  }
+
+  document.addEventListener('click', (e) => {
+    if(!emojiPicker.contains(e.target) && e.target !== emojiBtn) {
+      emojiPicker.classList.remove('visible');
+    }
+  });
+
+  userInput.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  // Export chat as text file
+  function exportChat() {
+    let textContent = `Chat with ${crushName}\n\n`;
+    chat.querySelectorAll('.message').forEach(msg => {
+      const sender = msg.classList.contains('bot') ? crushName : 'You';
+      const time = msg.querySelector('.timestamp').textContent;
+      const messageText = msg.firstChild.textContent;
+      textContent += `[${time}] ${sender}: ${messageText}\n`;
+    });
+
+    const blob = new Blob([textContent], {type: 'text/plain'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `flirty_chat_with_${crushName}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // Theme toggle
+  function updateTheme() {
+    if(isDarkMode) {
+      document.body.classList.add('dark');
+      themeToggleBtn.textContent = "Light Mode";
+    } else {
+      document.body.classList.remove('dark');
+      themeToggleBtn.textContent = "Dark Mode";
+    }
+  }
+  function toggleTheme() {
+    isDarkMode = !isDarkMode;
+    updateTheme();
+    saveChat();
+  }
+
+  // === Particle animation start ===
+  function startParticles() {
+    resizeCanvas();
+    initParticles();
+    animateParticles();
+  }
+
+  // Event listeners
+  startBtn.addEventListener('click', proceedToCrushScreen);
+  startChatBtn.addEventListener('click', startChat);
+  sendBtn.addEventListener('click', sendMessage);
+  emojiBtn.addEventListener('click', toggleEmojiPicker);
+  clearBtn.addEventListener('click', clearChat);
+  exportBtn.addEventListener('click', exportChat);
+  themeToggleBtn.addEventListener('click', toggleTheme);
+
+  // Initialize
+  buildEmojiPicker();
+  startParticles();
+
+  // Load saved chat on start
+  window.addEventListener('load', () => {
+    loadChat();
+    updateTheme();
+  });
+
+  // Canvas resize
+  function resizeCanvas() {
+    particleCanvas.width = window.innerWidth;
+    particleCanvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+
+})();
+</script>
+
 </body>
 </html>
