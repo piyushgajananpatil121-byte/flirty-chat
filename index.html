@@ -9,7 +9,9 @@
       box-sizing: border-box;
     }
     body, html {
-      margin: 0; padding: 0; height: 100%;
+      margin: 0; 
+      padding: 0; 
+      height: 100%;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #fceabb 0%, #f8b500 100%);
       display: flex;
@@ -53,11 +55,13 @@
       text-align: center;
       user-select: none;
     }
+
     #setup h2 {
       margin-bottom: 20px;
       font-weight: 800;
       color: #d6336c;
     }
+
     #setup label {
       display: block;
       font-weight: 600;
@@ -65,6 +69,7 @@
       font-size: 1.1rem;
       color: #666;
     }
+
     #setup select, #setup input[type=number] {
       width: 100%;
       padding: 10px 12px;
@@ -75,10 +80,12 @@
       transition: border-color 0.3s ease;
       font-weight: 500;
     }
+
     #setup select:focus, #setup input[type=number]:focus {
       border-color: #d6336c;
       box-shadow: 0 0 8px rgba(214, 51, 108, 0.4);
     }
+
     #startChatBtn {
       margin-top: 30px;
       width: 100%;
@@ -94,11 +101,13 @@
       transition: background-color 0.3s ease;
       user-select: none;
     }
+
     #startChatBtn:disabled {
       background: #ffa6c9;
       cursor: not-allowed;
       box-shadow: none;
     }
+
     #startChatBtn:not(:disabled):hover {
       background: #b52b5f;
     }
@@ -127,9 +136,11 @@
       scrollbar-width: thin;
       scrollbar-color: #d6336c #ffd7e6;
     }
+
     #messages::-webkit-scrollbar {
       width: 8px;
     }
+
     #messages::-webkit-scrollbar-thumb {
       background-color: #d6336c;
       border-radius: 10px;
@@ -146,6 +157,7 @@
       position: relative;
       animation: fadeInUp 0.3s ease forwards;
     }
+
     .user {
       background: linear-gradient(45deg, #85d8ce, #3ac3c9);
       color: white;
@@ -153,6 +165,7 @@
       border-bottom-right-radius: 5px;
       box-shadow: 0 6px 15px rgba(58, 195, 201, 0.5);
     }
+
     .bot {
       background: linear-gradient(45deg, #f6a0c6, #d6336c);
       color: white;
@@ -161,6 +174,7 @@
       box-shadow: 0 6px 15px rgba(214, 51, 108, 0.7);
       font-style: italic;
     }
+
     .error {
       background: #ffe6e6;
       color: #ff4d4d;
@@ -182,12 +196,13 @@
     }
 
     #inputArea {
-      display: flex;
+      display: flex !important;
       padding: 20px 25px;
       border-top: 1px solid #e3a1c9;
       background: linear-gradient(135deg, #f9cde9, #d6336c);
       box-shadow: 0 -10px 25px rgba(214, 51, 108, 0.5);
     }
+
     #userInput {
       flex-grow: 1;
       padding: 15px 20px;
@@ -201,9 +216,11 @@
       font-weight: 600;
       transition: box-shadow 0.3s ease;
     }
+
     #userInput:focus {
       box-shadow: inset 0 0 15px #ff73b5;
     }
+
     #sendBtn {
       background-color: #ff4e91;
       border: none;
@@ -218,10 +235,12 @@
       transition: background-color 0.3s ease;
       user-select: none;
     }
+
     #sendBtn:hover {
       background-color: #d6336c;
       box-shadow: 0 5px 25px #d6336c;
     }
+
     #sendBtn:disabled {
       background-color: #ffc1d9;
       cursor: not-allowed;
@@ -277,7 +296,7 @@
     </select>
 
     <label for="ageInput">Enter your age:</label>
-    <input id="ageInput" type="number" min="1" max="120" placeholder="e.g., 21" aria-required="true" />
+    <input id="ageInput" type="number" min="13" max="120" placeholder="e.g., 21" aria-required="true" />
 
     <button id="startChatBtn" disabled>Start Chat</button>
   </section>
@@ -293,7 +312,7 @@
   </section>
 
   <script>
-    // Elements
+    // DOM Elements
     const genderSelect = document.getElementById('genderSelect');
     const ageInput = document.getElementById('ageInput');
     const startChatBtn = document.getElementById('startChatBtn');
@@ -304,16 +323,17 @@
     const userInput = document.getElementById('userInput');
     const sendBtn = document.getElementById('sendBtn');
 
-    // Hugging Face API
-    const HF_API_KEY = "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";
-    const HF_API_URL = "https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill";
-
-    // User data
-    let userData = {
+    // User data with localStorage persistence
+    let userData = JSON.parse(localStorage.getItem('flirtyChatUser')) || {
       name: '',
       gender: '',
-      age: 0
+      age: 0,
+      conversation: []
     };
+
+    // Hugging Face API configuration
+    const HF_API_KEY = "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";
+    const HF_API_URL = "https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill";
 
     // Mock responses for fallback
     const flirtyResponses = [
@@ -325,33 +345,70 @@
       "Flirty and fun—just how I like it! What else you got? 💋"
     ];
 
-    // Enable start button only if valid inputs
+    // Initialize the app
+    function init() {
+      validateSetup();
+      loadConversation();
+      
+      // If we already have user data, skip setup
+      if (userData.name && userData.gender && userData.age) {
+        startChat();
+      }
+    }
+
+    // Validate setup form
     function validateSetup() {
       const gender = genderSelect.value;
       const age = Number(ageInput.value);
-      startChatBtn.disabled = !(gender && age >= 1 && age <= 120);
+      startChatBtn.disabled = !(gender && age >= 13 && age <= 120);
     }
+
+    // Load previous conversation from localStorage
+    function loadConversation() {
+      if (userData.conversation && userData.conversation.length > 0) {
+        userData.conversation.forEach(msg => {
+          if (msg.sender === 'user') {
+            appendUserMessage(msg.text);
+          } else {
+            appendBotMessage(msg.text);
+          }
+        });
+      }
+    }
+
+    // Save message to conversation history
+    function saveMessage(text, sender) {
+      userData.conversation.push({ text, sender });
+      localStorage.setItem('flirtyChatUser', JSON.stringify(userData));
+    }
+
+    // Event listeners
     genderSelect.addEventListener('change', validateSetup);
     ageInput.addEventListener('input', validateSetup);
 
-    // Store settings
     startChatBtn.addEventListener('click', () => {
       userData.gender = genderSelect.value;
       userData.age = Number(ageInput.value);
+      localStorage.setItem('flirtyChatUser', JSON.stringify(userData));
+      startChat();
+    });
 
-      // Set theme color on body
+    function startChat() {
       setDynamicBackground();
-
       setupSection.hidden = true;
       chatSection.hidden = false;
       userInput.disabled = false;
       sendBtn.disabled = false;
       userInput.focus();
 
-      appendBotMessage("Hey! What should I call you? 😉");
-    });
+      if (!userData.name) {
+        appendBotMessage("Hey! What should I call you? 😉");
+      } else if (userData.conversation.length === 0) {
+        appendBotMessage(`Welcome back, ${userData.name}! 😘 What's on your mind?`);
+      }
+    }
 
-    // Set dynamic background
+    // Set dynamic background based on user data
     function setDynamicBackground() {
       document.body.className = '';
       
@@ -376,26 +433,7 @@
       }
     }
 
-    // Append chat message helper
-    function appendMessage(text, sender, isError = false) {
-      const div = document.createElement('div');
-      div.classList.add('message', sender);
-      if (isError) div.classList.add('error');
-      div.textContent = text;
-      messagesDiv.appendChild(div);
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-      // Add hearts for flirty bot messages
-      if (sender === 'bot' && !isError && Math.random() > 0.6) {
-        createHearts();
-      }
-    }
-
-    function appendUserMessage(text) { appendMessage(text, 'user'); }
-    function appendBotMessage(text) { appendMessage(text, 'bot'); }
-    function appendErrorMessage(text) { appendMessage(text, '', true); }
-
-    // Create floating hearts
+    // Create floating hearts animation
     function createHearts() {
       for (let i = 0; i < 5; i++) {
         const heart = document.createElement('div');
@@ -406,17 +444,47 @@
         heart.style.animationDuration = (Math.random() * 3 + 2) + 's';
         document.body.appendChild(heart);
         
-        setTimeout(() => {
-          heart.remove();
-        }, 4000);
+        setTimeout(() => heart.remove(), 4000);
       }
     }
 
-    // Typing indicator helpers
-    function showTyping() { typingIndicator.style.display = 'block'; }
-    function hideTyping() { typingIndicator.style.display = 'none'; }
+    // Message handling functions
+    function appendMessage(text, sender, isError = false) {
+      const div = document.createElement('div');
+      div.classList.add('message', sender);
+      if (isError) div.classList.add('error');
+      div.textContent = text;
+      messagesDiv.appendChild(div);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
-    // Send message handler
+      if (sender === 'bot' && !isError && Math.random() > 0.6) {
+        createHearts();
+      }
+    }
+
+    function appendUserMessage(text) {
+      appendMessage(text, 'user');
+      saveMessage(text, 'user');
+    }
+
+    function appendBotMessage(text) {
+      appendMessage(text, 'bot');
+      saveMessage(text, 'bot');
+    }
+
+    function appendErrorMessage(text) {
+      appendMessage(text, '', true);
+    }
+
+    // Typing indicator
+    function showTyping() { 
+      typingIndicator.style.display = 'block'; 
+    }
+    function hideTyping() { 
+      typingIndicator.style.display = 'none'; 
+    }
+
+    // Main message sending function
     async function sendMessage() {
       const text = userInput.value.trim();
       if (!text) {
@@ -433,6 +501,7 @@
       // First message is the user's name
       if (!userData.name) {
         userData.name = text;
+        localStorage.setItem('flirtyChatUser', JSON.stringify(userData));
         setTimeout(() => {
           hideTyping();
           appendBotMessage(`Nice to meet you, ${userData.name}! 😘 What would you like to talk about?`);
@@ -457,14 +526,12 @@
         if (!response.ok) throw new Error("API failed");
 
         const data = await response.json();
-        const botReply = data.generated_text || flirtyResponses[Math.floor(Math.random() * flirtyResponses.length)];
+        const botReply = data.generated_text || getFallbackResponse();
         appendBotMessage(botReply);
 
       } catch (error) {
-        // Fallback to mock responses if API fails
         console.error("API Error:", error);
-        const randomResponse = flirtyResponses[Math.floor(Math.random() * flirtyResponses.length)];
-        appendBotMessage(randomResponse);
+        appendBotMessage(getFallbackResponse());
       }
 
       userInput.disabled = false;
@@ -473,16 +540,26 @@
       hideTyping();
     }
 
+    // Get a fallback response when API fails
+    function getFallbackResponse() {
+      return flirtyResponses[Math.floor(Math.random() * flirtyResponses.length)];
+    }
+
+    // Form submission handlers
     sendBtn.addEventListener('click', e => {
       e.preventDefault();
       sendMessage();
     });
+
     userInput.addEventListener('keypress', e => {
       if (e.key === 'Enter') {
         e.preventDefault();
         sendMessage();
       }
     });
+
+    // Initialize the application
+    init();
   </script>
 </body>
 </html>
