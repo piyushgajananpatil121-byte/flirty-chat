@@ -22,7 +22,6 @@
       transition: background 0.8s ease;
     }
 
-    /* Gender/Age Specific Backgrounds */
     .bg-male-young { background: linear-gradient(135deg, #0072ff, #00c6ff) !important; }
     .bg-male-adult { background: linear-gradient(135deg, #0f2027, #203a43, #2c5364) !important; }
     .bg-male-senior { background: linear-gradient(135deg, #1a2980, #26d0ce) !important; }
@@ -38,9 +37,7 @@
       font-weight: 700;
       text-align: center;
       color: #d6336c;
-      text-shadow: 0 2px 6px rgba(0,0,0,0.15);
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      z-index: 10;
     }
 
     #setup {
@@ -49,7 +46,7 @@
       box-shadow: 0 20px 40px rgba(214, 51, 108, 0.3);
       width: 350px;
       max-width: 90vw;
-      margin: 40px auto 20px;
+      margin: 40px auto;
       padding: 30px;
       text-align: center;
     }
@@ -68,7 +65,6 @@
       display: block;
       margin-bottom: 8px;
       font-weight: 600;
-      color: #666;
     }
 
     select, input {
@@ -235,7 +231,6 @@
 
     // Initialize
     function init() {
-      // Event listeners
       genderSelect.addEventListener('change', validateForm);
       ageInput.addEventListener('input', validateForm);
       startBtn.addEventListener('click', startChat);
@@ -244,7 +239,6 @@
         if (e.key === 'Enter') sendMessage();
       });
 
-      // Check for existing user data
       const savedUser = localStorage.getItem('flirtyChatUser');
       if (savedUser) {
         user = JSON.parse(savedUser);
@@ -252,33 +246,24 @@
       }
     }
 
-    // Validate form
     function validateForm() {
       startBtn.disabled = !(genderSelect.value && ageInput.value >= 13 && ageInput.value <= 120);
     }
 
-    // Start chat
     function startChat() {
       user.gender = genderSelect.value;
       user.age = parseInt(ageInput.value);
-      
-      // Set background based on gender/age
       setBackground();
-      
-      // Hide setup, show chat
       setup.style.display = 'none';
       chat.style.display = 'flex';
       
-      // Send greeting
       setTimeout(() => {
         addBotMessage(getGreeting());
       }, 500);
     }
 
-    // Set dynamic background
     function setBackground() {
       document.body.className = '';
-      
       if (user.gender === 'male') {
         if (user.age < 25) document.body.classList.add('bg-male-young');
         else if (user.age < 50) document.body.classList.add('bg-male-adult');
@@ -294,74 +279,6 @@
       }
     }
 
-    // Get greeting based on user data
-    function getGreeting() {
-      const greetings = {
-        male: {
-          young: ["Hey handsome! What's your name? 😏", "What's up stud? Tell me your name 😉"],
-          adult: ["Hello sir. May I have your name? 😊", "Good day. What shall I call you? 🌹"],
-          senior: ["Greetings gentleman. Your name please? 😌", "Hello there. And your name is? 💎"]
-        },
-        female: {
-          young: ["Hey beautiful! What's your name? 😍", "Hi gorgeous! Tell me your name 💋"],
-          adult: ["Hello ma'am. May I have your name? 😊", "Good day. What shall I call you? 🌹"],
-          senior: ["Greetings madam. Your name please? 😌", "Hello there. And your name is? 💎"]
-        },
-        other: {
-          young: ["Hey you! What's your name? 😊", "Hi there! Tell me your name 💖"],
-          adult: ["Hello! May I have your name? 😊", "Good day. What shall I call you? 🌈"],
-          senior: ["Greetings! Your name please? 😌", "Hello there. And your name is? 🌟"]
-        }
-      };
-      
-      let ageGroup = 'young';
-      if (user.age >= 25 && user.age < 50) ageGroup = 'adult';
-      else if (user.age >= 50) ageGroup = 'senior';
-      
-      const group = greetings[user.gender]?.[ageGroup] || greetings.other.adult;
-      return group[Math.floor(Math.random() * group.length)];
-    }
-
-    // Get flirty response
-    function getFlirtyResponse() {
-      const responses = {
-        young: [
-          "Wow, you're so fun to talk to! 😍",
-          "OMG, you're making me blush! 😳",
-          "You're such a tease! 😏",
-          "Haha, you're too much! 😂",
-          "Stop it, you're making me all flustered! 💕"
-        ],
-        adult: [
-          "Mmm, you know just what to say. 😉",
-          "You have such a way with words. 😊",
-          "Oh my, that's quite forward of you. 😏",
-          "You're making my circuits tingle. ⚡",
-          "Well, aren't you the charming one? 🌹"
-        ],
-        senior: [
-          "Oh you silver-tongued devil you. 😊",
-          "Your charm is timeless. 💎",
-          "My my, such sophistication. 😌",
-          "You're like a fine wine - gets better with age. 🍷",
-          "You're making me feel young again! 🌟"
-        ]
-      };
-      
-      let ageGroup = 'young';
-      if (user.age >= 30 && user.age < 60) ageGroup = 'adult';
-      else if (user.age >= 60) ageGroup = 'senior';
-      
-      // 20% chance of special response with hearts
-      if (Math.random() < 0.2) {
-        createHearts();
-        return `*blushes* ${user.name}, you're too much! 💋`;
-      }
-      
-      return responses[ageGroup][Math.floor(Math.random() * responses[ageGroup.length)];
-    }
-
-    // Send message
     async function sendMessage() {
       const text = userInput.value.trim();
       if (!text) return;
@@ -370,7 +287,6 @@
       userInput.value = '';
       showTyping();
       
-      // First message is name
       if (!user.name) {
         user.name = text;
         localStorage.setItem('flirtyChatUser', JSON.stringify(user));
@@ -382,15 +298,30 @@
         return;
       }
       
-      // Regular response
-      setTimeout(() => {
+      try {
+        const response = await fetch('http://localhost:3000/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: text,
+            name: user.name,
+            gender: user.gender,
+            age: user.age
+          })
+        });
+
+        const data = await response.json();
         hideTyping();
-        addBotMessage(getFlirtyResponse());
-        if (Math.random() > 0.5) createHearts();
-      }, 1000 + Math.random() * 1000);
+        addBotMessage(data.reply);
+        if (data.isFlirty) createHearts();
+        
+      } catch (error) {
+        hideTyping();
+        addBotMessage("Oops, let's try that again... 😊");
+        createHearts();
+      }
     }
 
-    // Add message to chat
     function addMessage(text, sender) {
       const msg = document.createElement('div');
       msg.className = `message ${sender}`;
@@ -407,7 +338,6 @@
       addMessage(text, 'bot');
     }
 
-    // Typing indicator
     function showTyping() {
       typingIndicator.style.display = 'block';
     }
@@ -416,7 +346,6 @@
       typingIndicator.style.display = 'none';
     }
 
-    // Create floating hearts
     function createHearts() {
       for (let i = 0; i < 5; i++) {
         const heart = document.createElement('div');
@@ -426,12 +355,37 @@
         heart.style.top = window.innerHeight + 'px';
         heart.style.fontSize = (Math.random() * 20 + 10) + 'px';
         document.body.appendChild(heart);
-        
         setTimeout(() => heart.remove(), 4000);
       }
     }
 
-    // Initialize the app
+    function getGreeting() {
+      const greetings = {
+        male: {
+          young: ["Hey handsome! What's your name? 😏"],
+          adult: ["Hello sir. May I have your name? 😊"],
+          senior: ["Greetings gentleman. Your name please? 😌"]
+        },
+        female: {
+          young: ["Hey beautiful! What's your name? 😍"],
+          adult: ["Hello ma'am. May I have your name? 😊"],
+          senior: ["Greetings madam. Your name please? 😌"]
+        },
+        other: {
+          young: ["Hey you! What's your name? 😊"],
+          adult: ["Hello! May I have your name? 😊"],
+          senior: ["Greetings! Your name please? 😌"]
+        }
+      };
+      
+      let ageGroup = 'young';
+      if (user.age >= 25 && user.age < 50) ageGroup = 'adult';
+      else if (user.age >= 50) ageGroup = 'senior';
+      
+      const group = greetings[user.gender]?.[ageGroup] || greetings.other.adult;
+      return group[Math.floor(Math.random() * group.length)];
+    }
+
     init();
   </script>
 </body>
