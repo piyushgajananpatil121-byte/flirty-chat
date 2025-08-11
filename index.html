@@ -9,9 +9,7 @@
       box-sizing: border-box;
     }
     body, html {
-      margin: 0; 
-      padding: 0; 
-      height: 100%;
+      margin: 0; padding: 0; height: 100%;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #fceabb 0%, #f8b500 100%);
       display: flex;
@@ -55,13 +53,11 @@
       text-align: center;
       user-select: none;
     }
-
     #setup h2 {
       margin-bottom: 20px;
       font-weight: 800;
       color: #d6336c;
     }
-
     #setup label {
       display: block;
       font-weight: 600;
@@ -69,7 +65,6 @@
       font-size: 1.1rem;
       color: #666;
     }
-
     #setup select, #setup input[type=number] {
       width: 100%;
       padding: 10px 12px;
@@ -80,12 +75,10 @@
       transition: border-color 0.3s ease;
       font-weight: 500;
     }
-
     #setup select:focus, #setup input[type=number]:focus {
       border-color: #d6336c;
       box-shadow: 0 0 8px rgba(214, 51, 108, 0.4);
     }
-
     #startChatBtn {
       margin-top: 30px;
       width: 100%;
@@ -101,13 +94,11 @@
       transition: background-color 0.3s ease;
       user-select: none;
     }
-
     #startChatBtn:disabled {
       background: #ffa6c9;
       cursor: not-allowed;
       box-shadow: none;
     }
-
     #startChatBtn:not(:disabled):hover {
       background: #b52b5f;
     }
@@ -136,11 +127,9 @@
       scrollbar-width: thin;
       scrollbar-color: #d6336c #ffd7e6;
     }
-
     #messages::-webkit-scrollbar {
       width: 8px;
     }
-
     #messages::-webkit-scrollbar-thumb {
       background-color: #d6336c;
       border-radius: 10px;
@@ -157,7 +146,6 @@
       position: relative;
       animation: fadeInUp 0.3s ease forwards;
     }
-
     .user {
       background: linear-gradient(45deg, #85d8ce, #3ac3c9);
       color: white;
@@ -165,7 +153,6 @@
       border-bottom-right-radius: 5px;
       box-shadow: 0 6px 15px rgba(58, 195, 201, 0.5);
     }
-
     .bot {
       background: linear-gradient(45deg, #f6a0c6, #d6336c);
       color: white;
@@ -174,7 +161,6 @@
       box-shadow: 0 6px 15px rgba(214, 51, 108, 0.7);
       font-style: italic;
     }
-
     .error {
       background: #ffe6e6;
       color: #ff4d4d;
@@ -202,7 +188,6 @@
       background: linear-gradient(135deg, #f9cde9, #d6336c);
       box-shadow: 0 -10px 25px rgba(214, 51, 108, 0.5);
     }
-
     #userInput {
       flex-grow: 1;
       padding: 15px 20px;
@@ -216,11 +201,9 @@
       font-weight: 600;
       transition: box-shadow 0.3s ease;
     }
-
     #userInput:focus {
       box-shadow: inset 0 0 15px #ff73b5;
     }
-
     #sendBtn {
       background-color: #ff4e91;
       border: none;
@@ -235,12 +218,10 @@
       transition: background-color 0.3s ease;
       user-select: none;
     }
-
     #sendBtn:hover {
       background-color: #d6336c;
       box-shadow: 0 5px 25px #d6336c;
     }
-
     #sendBtn:disabled {
       background-color: #ffc1d9;
       cursor: not-allowed;
@@ -330,10 +311,6 @@
       age: 0,
       conversation: []
     };
-
-    // Hugging Face API configuration
-    const HF_API_KEY = "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";
-    const HF_API_URL = "https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill";
 
     // Mock responses for fallback
     const flirtyResponses = [
@@ -513,24 +490,15 @@
       }
 
       try {
-        // Try Hugging Face API first
-        const response = await fetch(HF_API_URL, {
-          method: "POST",
-          headers: { 
-            "Authorization": `Bearer ${HF_API_KEY}`,
-            "Content-Type": "application/json" 
-          },
-          body: JSON.stringify({ inputs: text }),
-        });
-
-        if (!response.ok) throw new Error("API failed");
-
-        const data = await response.json();
-        const botReply = data.generated_text || getFallbackResponse();
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Use mock responses since Hugging Face API requires server-side implementation
+        const botReply = getFallbackResponse();
         appendBotMessage(botReply);
 
       } catch (error) {
-        console.error("API Error:", error);
+        console.error("Error:", error);
         appendBotMessage(getFallbackResponse());
       }
 
@@ -540,9 +508,16 @@
       hideTyping();
     }
 
-    // Get a fallback response when API fails
+    // Get a fallback response
     function getFallbackResponse() {
-      return flirtyResponses[Math.floor(Math.random() * flirtyResponses.length)];
+      const personalizedResponses = [
+        `Oh ${userData.name}, you're such a tease! 😏`,
+        `${userData.name}, you're making me blush! 😳`,
+        `Mmm, ${userData.name}, tell me more... 😘`,
+        `${userData.name}, you're too charming! 💋`,
+        `Wow ${userData.name}, you're smooth! 😉`
+      ];
+      return personalizedResponses[Math.floor(Math.random() * personalizedResponses.length)];
     }
 
     // Form submission handlers
