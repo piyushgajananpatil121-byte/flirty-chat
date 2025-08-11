@@ -7,9 +7,12 @@
   <style>
     * {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
+    
     body, html {
-      margin: 0; padding: 0; height: 100%;
+      height: 100%;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #fceabb 0%, #f8b500 100%);
       display: flex;
@@ -33,11 +36,9 @@
       padding: 20px;
       font-size: 2rem;
       font-weight: 700;
-      letter-spacing: 0.1em;
       text-align: center;
       color: #d6336c;
       text-shadow: 0 2px 6px rgba(0,0,0,0.15);
-      user-select: none;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
       z-index: 10;
     }
@@ -49,215 +50,132 @@
       width: 350px;
       max-width: 90vw;
       margin: 40px auto 20px;
-      padding: 30px 40px;
+      padding: 30px;
       text-align: center;
-      user-select: none;
     }
+
     #setup h2 {
       margin-bottom: 20px;
-      font-weight: 800;
       color: #d6336c;
     }
-    #setup label {
+
+    .form-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    label {
       display: block;
+      margin-bottom: 8px;
       font-weight: 600;
-      margin: 15px 0 8px;
-      font-size: 1.1rem;
       color: #666;
     }
-    #setup select, #setup input[type=number] {
+
+    select, input {
       width: 100%;
-      padding: 10px 12px;
-      font-size: 1rem;
+      padding: 12px 15px;
       border-radius: 12px;
       border: 1px solid #ddd;
-      outline: none;
-      transition: border-color 0.3s ease;
-      font-weight: 500;
+      font-size: 1rem;
     }
-    #setup select:focus, #setup input[type=number]:focus {
-      border-color: #d6336c;
-      box-shadow: 0 0 8px rgba(214, 51, 108, 0.4);
-    }
+
     #startChatBtn {
-      margin-top: 30px;
       width: 100%;
       background: #d6336c;
-      border: none;
       color: white;
-      font-size: 1.2rem;
-      font-weight: 700;
       padding: 14px 0;
       border-radius: 15px;
       cursor: pointer;
-      box-shadow: 0 8px 16px rgba(214, 51, 108, 0.4);
-      transition: background-color 0.3s ease;
-      user-select: none;
-    }
-    #startChatBtn:disabled {
-      background: #ffa6c9;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
-    #startChatBtn:not(:disabled):hover {
-      background: #b52b5f;
+      border: none;
+      font-weight: 700;
+      margin-top: 20px;
     }
 
     #chat {
-      flex-grow: 1;
       display: none;
       flex-direction: column;
-      max-width: 600px;
-      margin: 0 auto 40px;
-      background: white;
-      border-radius: 25px;
-      box-shadow: 0 25px 60px rgba(214, 51, 108, 0.4);
-      overflow: hidden;
-      user-select: none;
+      height: calc(100vh - 80px);
+      max-width: 800px;
+      margin: 0 auto;
+      width: 100%;
     }
 
     #messages {
-      flex-grow: 1;
+      flex: 1;
       overflow-y: auto;
-      padding: 25px 20px 20px 20px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
       gap: 15px;
       background: linear-gradient(135deg, #fff0f5, #ffe6f2);
-      scrollbar-width: thin;
-      scrollbar-color: #d6336c #ffd7e6;
-    }
-    #messages::-webkit-scrollbar {
-      width: 8px;
-    }
-    #messages::-webkit-scrollbar-thumb {
-      background-color: #d6336c;
-      border-radius: 10px;
     }
 
     .message {
-      max-width: 70%;
-      padding: 14px 18px;
-      border-radius: 25px;
-      font-size: 1.1rem;
-      line-height: 1.3;
-      word-wrap: break-word;
-      box-shadow: 0 3px 10px rgba(214, 51, 108, 0.15);
-      position: relative;
-      animation: fadeInUp 0.3s ease forwards;
+      max-width: 80%;
+      padding: 15px 20px;
+      border-radius: 20px;
+      animation: fadeIn 0.3s ease;
     }
+
     .user {
       background: linear-gradient(45deg, #85d8ce, #3ac3c9);
       color: white;
       align-self: flex-end;
-      border-bottom-right-radius: 5px;
-      box-shadow: 0 6px 15px rgba(58, 195, 201, 0.5);
     }
+
     .bot {
       background: linear-gradient(45deg, #f6a0c6, #d6336c);
       color: white;
       align-self: flex-start;
-      border-bottom-left-radius: 5px;
-      box-shadow: 0 6px 15px rgba(214, 51, 108, 0.7);
-      font-style: italic;
-    }
-    .error {
-      background: #ffe6e6;
-      color: #ff4d4d;
-      align-self: center;
-      max-width: 90%;
-      text-align: center;
-      border-radius: 10px;
-    }
-
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(8px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
     }
 
     #inputArea {
-      display: flex !important;
-      padding: 20px 25px;
-      border-top: 1px solid #e3a1c9;
-      background: linear-gradient(135deg, #f9cde9, #d6336c);
-      box-shadow: 0 -10px 25px rgba(214, 51, 108, 0.5);
+      display: flex;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.8);
     }
+
     #userInput {
-      flex-grow: 1;
-      padding: 15px 20px;
-      font-size: 1.2rem;
-      border-radius: 40px;
+      flex: 1;
+      padding: 15px;
+      border-radius: 25px;
       border: none;
       outline: none;
-      box-shadow: inset 0 0 10px #f8a4c4;
-      background: white;
-      color: #d6336c;
-      font-weight: 600;
-      transition: box-shadow 0.3s ease;
     }
-    #userInput:focus {
-      box-shadow: inset 0 0 15px #ff73b5;
-    }
+
     #sendBtn {
-      background-color: #ff4e91;
-      border: none;
+      background: #d6336c;
       color: white;
-      font-size: 1.2rem;
-      padding: 0 25px;
-      margin-left: 15px;
-      border-radius: 40px;
-      font-weight: 700;
+      border: none;
+      padding: 0 20px;
+      border-radius: 25px;
+      margin-left: 10px;
       cursor: pointer;
-      box-shadow: 0 4px 20px #ff4e91;
-      transition: background-color 0.3s ease;
-      user-select: none;
-    }
-    #sendBtn:hover {
-      background-color: #d6336c;
-      box-shadow: 0 5px 25px #d6336c;
-    }
-    #sendBtn:disabled {
-      background-color: #ffc1d9;
-      cursor: not-allowed;
-      box-shadow: none;
     }
 
     #typingIndicator {
-      margin-left: 15px;
-      align-self: flex-start;
+      display: none;
       font-style: italic;
       color: #d6336c;
-      display: none;
-      font-weight: 600;
+      padding: 10px;
     }
 
     .heart {
-      position: absolute;
-      pointer-events: none;
-      animation: float 4s ease-in-out infinite;
+      position: fixed;
+      animation: float 4s linear forwards;
+      z-index: 100;
     }
 
     @keyframes float {
-      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-      100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+      to {
+        transform: translateY(-100vh);
+        opacity: 0;
+      }
     }
 
-    @media (max-width: 650px) {
-      #chat {
+    @media (max-width: 768px) {
+      #setup, #chat {
         width: 95vw;
-        border-radius: 15px;
-        margin-bottom: 20px;
-      }
-      #setup {
-        width: 95vw;
-        margin: 20px auto;
-        padding: 25px 20px;
       }
     }
   </style>
@@ -265,275 +183,255 @@
 <body>
   <header>Flirty AI Chatbot</header>
 
-  <section id="setup" role="region" aria-label="Setup your chatbot preferences">
+  <section id="setup">
     <h2>Welcome! Let's set up your chat</h2>
-
-    <label for="genderSelect">Select your gender:</label>
-    <select id="genderSelect" aria-required="true" aria-describedby="genderDesc">
-      <option value="" disabled selected>Select gender</option>
-      <option value="male">Male</option>
-      <option value="female">Female</option>
-      <option value="other">Other / Prefer not to say</option>
-    </select>
-
-    <label for="ageInput">Enter your age:</label>
-    <input id="ageInput" type="number" min="13" max="120" placeholder="e.g., 21" aria-required="true" />
-
-    <button id="startChatBtn" disabled>Start Chat</button>
+    
+    <div class="form-group">
+      <label for="gender">Your Gender:</label>
+      <select id="gender">
+        <option value="" selected disabled>Select gender</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label for="age">Your Age:</label>
+      <input type="number" id="age" min="13" max="120" placeholder="e.g. 21">
+    </div>
+    
+    <button id="startChatBtn" disabled>Start Chatting</button>
   </section>
 
-  <section id="chat" role="region" aria-live="polite" aria-label="Chat conversation" hidden>
-    <div id="messages" aria-live="polite" aria-atomic="false"></div>
-    <div id="typingIndicator" aria-live="assertive" aria-atomic="true">Typing...</div>
-
-    <form id="inputArea" aria-label="Send message form">
-      <input type="text" id="userInput" autocomplete="off" placeholder="Say something flirty..." aria-label="Message input" />
-      <button id="sendBtn" type="submit" disabled>Send</button>
-    </form>
+  <section id="chat">
+    <div id="messages"></div>
+    <div id="typingIndicator">AI is typing...</div>
+    
+    <div id="inputArea">
+      <input type="text" id="userInput" placeholder="Say something flirty...">
+      <button id="sendBtn">Send</button>
+    </div>
   </section>
 
   <script>
     // DOM Elements
-    const genderSelect = document.getElementById('genderSelect');
-    const ageInput = document.getElementById('ageInput');
-    const startChatBtn = document.getElementById('startChatBtn');
-    const setupSection = document.getElementById('setup');
-    const chatSection = document.getElementById('chat');
-    const messagesDiv = document.getElementById('messages');
-    const typingIndicator = document.getElementById('typingIndicator');
+    const setup = document.getElementById('setup');
+    const chat = document.getElementById('chat');
+    const messages = document.getElementById('messages');
     const userInput = document.getElementById('userInput');
     const sendBtn = document.getElementById('sendBtn');
+    const startBtn = document.getElementById('startChatBtn');
+    const genderSelect = document.getElementById('gender');
+    const ageInput = document.getElementById('age');
+    const typingIndicator = document.getElementById('typingIndicator');
 
-    // User data with localStorage persistence
-    let userData = JSON.parse(localStorage.getItem('flirtyChatUser')) || {
+    // User data
+    let user = {
       name: '',
       gender: '',
-      age: 0,
-      conversation: []
+      age: 0
     };
 
-    // Mock responses for fallback
-    const flirtyResponses = [
-      "Oh, you're smooth! What's your secret? 😉",
-      "Mmm, I like where this is going… tell me more. 😘",
-      "Is that your best line? I bet you can do better. 😏",
-      "You're making me blush… and I'm just an AI! 🌹",
-      "I'd respond with something clever, but you've left me speechless. 😳",
-      "Flirty and fun—just how I like it! What else you got? 💋"
-    ];
-
-    // Initialize the app
+    // Initialize
     function init() {
-      validateSetup();
-      loadConversation();
-      
-      // If we already have user data, skip setup
-      if (userData.name && userData.gender && userData.age) {
+      // Event listeners
+      genderSelect.addEventListener('change', validateForm);
+      ageInput.addEventListener('input', validateForm);
+      startBtn.addEventListener('click', startChat);
+      sendBtn.addEventListener('click', sendMessage);
+      userInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+      });
+
+      // Check for existing user data
+      const savedUser = localStorage.getItem('flirtyChatUser');
+      if (savedUser) {
+        user = JSON.parse(savedUser);
         startChat();
       }
     }
 
-    // Validate setup form
-    function validateSetup() {
-      const gender = genderSelect.value;
-      const age = Number(ageInput.value);
-      startChatBtn.disabled = !(gender && age >= 13 && age <= 120);
+    // Validate form
+    function validateForm() {
+      startBtn.disabled = !(genderSelect.value && ageInput.value >= 13 && ageInput.value <= 120);
     }
 
-    // Load previous conversation from localStorage
-    function loadConversation() {
-      if (userData.conversation && userData.conversation.length > 0) {
-        userData.conversation.forEach(msg => {
-          if (msg.sender === 'user') {
-            appendUserMessage(msg.text);
-          } else {
-            appendBotMessage(msg.text);
-          }
-        });
-      }
-    }
-
-    // Save message to conversation history
-    function saveMessage(text, sender) {
-      userData.conversation.push({ text, sender });
-      localStorage.setItem('flirtyChatUser', JSON.stringify(userData));
-    }
-
-    // Event listeners
-    genderSelect.addEventListener('change', validateSetup);
-    ageInput.addEventListener('input', validateSetup);
-
-    startChatBtn.addEventListener('click', () => {
-      userData.gender = genderSelect.value;
-      userData.age = Number(ageInput.value);
-      localStorage.setItem('flirtyChatUser', JSON.stringify(userData));
-      startChat();
-    });
-
+    // Start chat
     function startChat() {
-      setDynamicBackground();
-      setupSection.hidden = true;
-      chatSection.hidden = false;
-      userInput.disabled = false;
-      sendBtn.disabled = false;
-      userInput.focus();
-
-      if (!userData.name) {
-        appendBotMessage("Hey! What should I call you? 😉");
-      } else if (userData.conversation.length === 0) {
-        appendBotMessage(`Welcome back, ${userData.name}! 😘 What's on your mind?`);
-      }
+      user.gender = genderSelect.value;
+      user.age = parseInt(ageInput.value);
+      
+      // Set background based on gender/age
+      setBackground();
+      
+      // Hide setup, show chat
+      setup.style.display = 'none';
+      chat.style.display = 'flex';
+      
+      // Send greeting
+      setTimeout(() => {
+        addBotMessage(getGreeting());
+      }, 500);
     }
 
-    // Set dynamic background based on user data
-    function setDynamicBackground() {
+    // Set dynamic background
+    function setBackground() {
       document.body.className = '';
       
-      if (userData.gender === 'male') {
-        if (userData.age < 25) {
-          document.body.classList.add('bg-male-young');
-        } else if (userData.age < 50) {
-          document.body.classList.add('bg-male-adult');
-        } else {
-          document.body.classList.add('bg-male-senior');
-        }
-      } else if (userData.gender === 'female') {
-        if (userData.age < 25) {
-          document.body.classList.add('bg-female-young');
-        } else if (userData.age < 50) {
-          document.body.classList.add('bg-female-adult');
-        } else {
-          document.body.classList.add('bg-female-senior');
-        }
-      } else {
+      if (user.gender === 'male') {
+        if (user.age < 25) document.body.classList.add('bg-male-young');
+        else if (user.age < 50) document.body.classList.add('bg-male-adult');
+        else document.body.classList.add('bg-male-senior');
+      } 
+      else if (user.gender === 'female') {
+        if (user.age < 25) document.body.classList.add('bg-female-young');
+        else if (user.age < 50) document.body.classList.add('bg-female-adult');
+        else document.body.classList.add('bg-female-senior');
+      } 
+      else {
         document.body.classList.add('bg-other');
       }
     }
 
-    // Create floating hearts animation
+    // Get greeting based on user data
+    function getGreeting() {
+      const greetings = {
+        male: {
+          young: ["Hey handsome! What's your name? 😏", "What's up stud? Tell me your name 😉"],
+          adult: ["Hello sir. May I have your name? 😊", "Good day. What shall I call you? 🌹"],
+          senior: ["Greetings gentleman. Your name please? 😌", "Hello there. And your name is? 💎"]
+        },
+        female: {
+          young: ["Hey beautiful! What's your name? 😍", "Hi gorgeous! Tell me your name 💋"],
+          adult: ["Hello ma'am. May I have your name? 😊", "Good day. What shall I call you? 🌹"],
+          senior: ["Greetings madam. Your name please? 😌", "Hello there. And your name is? 💎"]
+        },
+        other: {
+          young: ["Hey you! What's your name? 😊", "Hi there! Tell me your name 💖"],
+          adult: ["Hello! May I have your name? 😊", "Good day. What shall I call you? 🌈"],
+          senior: ["Greetings! Your name please? 😌", "Hello there. And your name is? 🌟"]
+        }
+      };
+      
+      let ageGroup = 'young';
+      if (user.age >= 25 && user.age < 50) ageGroup = 'adult';
+      else if (user.age >= 50) ageGroup = 'senior';
+      
+      const group = greetings[user.gender]?.[ageGroup] || greetings.other.adult;
+      return group[Math.floor(Math.random() * group.length)];
+    }
+
+    // Get flirty response
+    function getFlirtyResponse() {
+      const responses = {
+        young: [
+          "Wow, you're so fun to talk to! 😍",
+          "OMG, you're making me blush! 😳",
+          "You're such a tease! 😏",
+          "Haha, you're too much! 😂",
+          "Stop it, you're making me all flustered! 💕"
+        ],
+        adult: [
+          "Mmm, you know just what to say. 😉",
+          "You have such a way with words. 😊",
+          "Oh my, that's quite forward of you. 😏",
+          "You're making my circuits tingle. ⚡",
+          "Well, aren't you the charming one? 🌹"
+        ],
+        senior: [
+          "Oh you silver-tongued devil you. 😊",
+          "Your charm is timeless. 💎",
+          "My my, such sophistication. 😌",
+          "You're like a fine wine - gets better with age. 🍷",
+          "You're making me feel young again! 🌟"
+        ]
+      };
+      
+      let ageGroup = 'young';
+      if (user.age >= 30 && user.age < 60) ageGroup = 'adult';
+      else if (user.age >= 60) ageGroup = 'senior';
+      
+      // 20% chance of special response with hearts
+      if (Math.random() < 0.2) {
+        createHearts();
+        return `*blushes* ${user.name}, you're too much! 💋`;
+      }
+      
+      return responses[ageGroup][Math.floor(Math.random() * responses[ageGroup.length)];
+    }
+
+    // Send message
+    async function sendMessage() {
+      const text = userInput.value.trim();
+      if (!text) return;
+      
+      addUserMessage(text);
+      userInput.value = '';
+      showTyping();
+      
+      // First message is name
+      if (!user.name) {
+        user.name = text;
+        localStorage.setItem('flirtyChatUser', JSON.stringify(user));
+        setTimeout(() => {
+          hideTyping();
+          addBotMessage(`Nice to meet you, ${user.name}! 😘 What would you like to talk about?`);
+          createHearts();
+        }, 1500);
+        return;
+      }
+      
+      // Regular response
+      setTimeout(() => {
+        hideTyping();
+        addBotMessage(getFlirtyResponse());
+        if (Math.random() > 0.5) createHearts();
+      }, 1000 + Math.random() * 1000);
+    }
+
+    // Add message to chat
+    function addMessage(text, sender) {
+      const msg = document.createElement('div');
+      msg.className = `message ${sender}`;
+      msg.textContent = text;
+      messages.appendChild(msg);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function addUserMessage(text) {
+      addMessage(text, 'user');
+    }
+
+    function addBotMessage(text) {
+      addMessage(text, 'bot');
+    }
+
+    // Typing indicator
+    function showTyping() {
+      typingIndicator.style.display = 'block';
+    }
+
+    function hideTyping() {
+      typingIndicator.style.display = 'none';
+    }
+
+    // Create floating hearts
     function createHearts() {
       for (let i = 0; i < 5; i++) {
         const heart = document.createElement('div');
         heart.innerHTML = '❤️';
-        heart.classList.add('heart');
+        heart.className = 'heart';
         heart.style.left = Math.random() * 100 + 'vw';
+        heart.style.top = window.innerHeight + 'px';
         heart.style.fontSize = (Math.random() * 20 + 10) + 'px';
-        heart.style.animationDuration = (Math.random() * 3 + 2) + 's';
         document.body.appendChild(heart);
         
         setTimeout(() => heart.remove(), 4000);
       }
     }
 
-    // Message handling functions
-    function appendMessage(text, sender, isError = false) {
-      const div = document.createElement('div');
-      div.classList.add('message', sender);
-      if (isError) div.classList.add('error');
-      div.textContent = text;
-      messagesDiv.appendChild(div);
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-      if (sender === 'bot' && !isError && Math.random() > 0.6) {
-        createHearts();
-      }
-    }
-
-    function appendUserMessage(text) {
-      appendMessage(text, 'user');
-      saveMessage(text, 'user');
-    }
-
-    function appendBotMessage(text) {
-      appendMessage(text, 'bot');
-      saveMessage(text, 'bot');
-    }
-
-    function appendErrorMessage(text) {
-      appendMessage(text, '', true);
-    }
-
-    // Typing indicator
-    function showTyping() { 
-      typingIndicator.style.display = 'block'; 
-    }
-    function hideTyping() { 
-      typingIndicator.style.display = 'none'; 
-    }
-
-    // Main message sending function
-    async function sendMessage() {
-      const text = userInput.value.trim();
-      if (!text) {
-        appendErrorMessage("Please type a message first!");
-        return;
-      }
-
-      appendUserMessage(text);
-      userInput.value = '';
-      userInput.disabled = true;
-      sendBtn.disabled = true;
-      showTyping();
-
-      // First message is the user's name
-      if (!userData.name) {
-        userData.name = text;
-        localStorage.setItem('flirtyChatUser', JSON.stringify(userData));
-        setTimeout(() => {
-          hideTyping();
-          appendBotMessage(`Nice to meet you, ${userData.name}! 😘 What would you like to talk about?`);
-          userInput.disabled = false;
-          sendBtn.disabled = false;
-          userInput.focus();
-        }, 1500);
-        return;
-      }
-
-      try {
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Use mock responses since Hugging Face API requires server-side implementation
-        const botReply = getFallbackResponse();
-        appendBotMessage(botReply);
-
-      } catch (error) {
-        console.error("Error:", error);
-        appendBotMessage(getFallbackResponse());
-      }
-
-      userInput.disabled = false;
-      sendBtn.disabled = false;
-      userInput.focus();
-      hideTyping();
-    }
-
-    // Get a fallback response
-    function getFallbackResponse() {
-      const personalizedResponses = [
-        `Oh ${userData.name}, you're such a tease! 😏`,
-        `${userData.name}, you're making me blush! 😳`,
-        `Mmm, ${userData.name}, tell me more... 😘`,
-        `${userData.name}, you're too charming! 💋`,
-        `Wow ${userData.name}, you're smooth! 😉`
-      ];
-      return personalizedResponses[Math.floor(Math.random() * personalizedResponses.length)];
-    }
-
-    // Form submission handlers
-    sendBtn.addEventListener('click', e => {
-      e.preventDefault();
-      sendMessage();
-    });
-
-    userInput.addEventListener('keypress', e => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        sendMessage();
-      }
-    });
-
-    // Initialize the application
+    // Initialize the app
     init();
   </script>
 </body>
